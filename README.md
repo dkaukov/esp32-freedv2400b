@@ -50,5 +50,9 @@ This is a direct C++ port of `freedv2400b-java`, itself based on Codec2 revision
 work is from Codec2, copyright David Rowe, with Brady O'Brien identified as an
 author where applicable. Golden interoperability data is Codec2-generated.
 
+Native tests also decode Debian FreeDV 1.4.3's real `ve9qrp_2400b.wav`
+recording, matching `freedv2400b-java` PR #2: acquisition on call two, one
+acquisition total, continuous synchronization, and all 2,810 voice frames.
+
 Licensed GPL-3.0-only. Run `pio test -e native`, `pio run -e esp32dev`, and
 `pio run -e esp32s3`.
