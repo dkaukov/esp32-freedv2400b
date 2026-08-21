@@ -2,6 +2,7 @@
 #include <unity.h>
 #include <FreeDv2400b.h>
 #include <stdio.h>
+#include <string>
 #include <string.h>
 #include <vector>
 
