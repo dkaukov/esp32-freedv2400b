@@ -56,3 +56,13 @@ acquisition total, continuous synchronization, and all 2,810 voice frames.
 
 Licensed GPL-3.0-only. Run `pio test -e native`, `pio run -e esp32dev`, and
 `pio run -e esp32s3`.
+
+For the full hardware-in-the-loop recording test, connect an ESP32 and run:
+
+```text
+python tools/run_serial_recording_test.py --port /dev/cu.usbserial-0001
+```
+
+The runner uploads the serial test sketch, streams all 10.8 MB of discriminator
+PCM while following the decoder's adaptive requested block size, and compares
+every payload returned by the device with the saved 2,810-frame fixture.
