@@ -55,4 +55,20 @@ void test_data_no_stale(){
  uint8_t b[96]; detail::VhfTypeAFramer::frame(GOLDEN_PAYLOAD,b);for(int i=0;i<16;i++)b[40+i]=(0xf1fc>>(15-i))&1;
  detail::VhfTypeADeframer d;uint8_t out[7];memset(out,0x5a,7);TEST_ASSERT_TRUE(d.accept(b,out));TEST_ASSERT_EQUAL((int)FreeDv2400bFrameType::DATA,(int)d.frameType());for(int i=0;i<7;i++)TEST_ASSERT_EQUAL_HEX8(0x5a,out[i]);
 }
-int main(int,char**){UNITY_BEGIN();RUN_TEST(test_framing_and_exact_tx);RUN_TEST(test_golden_inverted_chunking_reset);RUN_TEST(test_degraded);RUN_TEST(test_sample_clock_error);RUN_TEST(test_data_no_stale);return UNITY_END();}
+void test_ve9qrp_recording_sync(){
+ FILE *f=fopen("test/fixtures/ve9qrp_2400b.wav","rb");TEST_ASSERT_NOT_NULL(f);TEST_ASSERT_EQUAL(0,fseek(f,44,SEEK_SET));
+ FILE *frames=fopen("test/fixtures/ve9qrp_2400b_voice_frames.bin","rb");TEST_ASSERT_NOT_NULL(frames);
+ FreeDv2400bDecoder decoder;int16_t input[MAX_RX_INPUT];uint8_t payload[PAYLOAD_BYTES];FreeDv2400bDecodeResult result={};
+ int decodeCalls=0,firstSynchronizedCall=0,syncAcquisitions=0,synchronizedCalls=0,voiceFrames=0;bool previouslySynchronized=false;
+ for(;;){
+  int required=decoder.inputSamplesRequired();size_t n=fread(input,sizeof(input[0]),required,f);if(n!=(size_t)required)break;
+  TEST_ASSERT_TRUE(decoder.decode(input,n,payload,result));decodeCalls++;
+  if(result.synchronized){synchronizedCalls++;if(!previouslySynchronized){syncAcquisitions++;if(firstSynchronizedCall==0)firstSynchronizedCall=decodeCalls;}}
+  if(result.framePresent&&result.frameType==FreeDv2400bFrameType::VOICE){uint8_t expected[PAYLOAD_BYTES];TEST_ASSERT_EQUAL(PAYLOAD_BYTES,fread(expected,1,PAYLOAD_BYTES,frames));TEST_ASSERT_EQUAL_UINT8_ARRAY(expected,payload,PAYLOAD_BYTES);voiceFrames++;}
+  previouslySynchronized=result.synchronized;
+ }
+ TEST_ASSERT_EQUAL(EOF,fgetc(frames));fclose(frames);fclose(f);
+ TEST_ASSERT_EQUAL(2,firstSynchronizedCall);TEST_ASSERT_EQUAL(1,syncAcquisitions);
+ TEST_ASSERT_EQUAL(decodeCalls-1,synchronizedCalls);TEST_ASSERT_EQUAL(2810,voiceFrames);TEST_ASSERT_TRUE(result.synchronized);
+}
+int main(int,char**){UNITY_BEGIN();RUN_TEST(test_framing_and_exact_tx);RUN_TEST(test_golden_inverted_chunking_reset);RUN_TEST(test_degraded);RUN_TEST(test_sample_clock_error);RUN_TEST(test_data_no_stale);RUN_TEST(test_ve9qrp_recording_sync);return UNITY_END();}
