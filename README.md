@@ -38,9 +38,15 @@ uint8_t payload[7] = {0x11,0x22,0x33,0x44,0x55,0x66,0x70};
 mod.modulate(payload, 7, scratch, 256);
 ```
 
+TX level can be configured without floating point using
+`mod.setMagnitude(level)`. The default magnitude is 16383 and remains
+sample-exact with Codec2; values are clamped to 32767. The configured magnitude
+is stored in the modem object rather than calculated for each sample.
+`FreeDv2400bEncoder` provides the same setting.
+
 There is no heap allocation in RX or TX processing. On a 32-bit target the
-decoder is 8192 bytes on the native ABI tested. The streaming demodulator is
-12064 bytes on ESP32 (12080 bytes on the native 64-bit ABI), including its
+decoder is approximately 8 KiB. The streaming demodulator is 12068 bytes on
+ESP32, including its
 3850-byte input FIFO.
 
 ## Compatibility and attribution
@@ -66,3 +72,14 @@ python tools/run_serial_recording_test.py --port /dev/cu.usbserial-0001
 The runner uploads the serial test sketch, streams all 10.8 MB of discriminator
 PCM while following the decoder's adaptive requested block size, and compares
 every payload returned by the device with the saved 2,810-frame fixture.
+It reports known-payload BER per frame as errors out of 52 bits, grouped by the
+frame's unique-word error count. Pass `--report-frames` to print every frame.
+
+`examples/kv4p_adc_rx` demonstrates live 48 kHz ADC reception using Arduino
+Audio Tools and the KV4P-HT ESP32-WROOM pinout and analog bias arrangement.
+Live decode results include Codec2's smoothed Type-A unique-word BER estimate,
+labelled `uw_ber_ema` to distinguish it from known-payload BER in tests.
+
+`examples/kv4p_pattern_tx` configures the same KV4P/SA818 hardware at
+446.0000 MHz and continuously transmits repeated `11 22 33 44 55 66 70`
+modem frames, apart from its short DMA-drain/PTT transition between bursts.
