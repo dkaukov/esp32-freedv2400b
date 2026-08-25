@@ -54,7 +54,7 @@ public:
                     bool matched = match(onInverted_ ? inverted_ : normal_, 3);
                     if (matched) misses_ = 0; else ++misses_;
                     if (misses_ > 4) sync_ = false;
-                    type_ = matchType_; errors_ = matchErrors_; extracted = true;
+                    type_ = matchType_; errors_ = matchErrors_; updateBer(); extracted = true;
                     if (type_ == FreeDv2400bFrameType::VOICE) extract(onInverted_ ? inverted_ : normal_, payload);
                 }
             } else {
@@ -68,13 +68,15 @@ public:
     bool synchronizedNow() const { return sync_; }
     FreeDv2400bFrameType frameType() const { return type_; }
     uint8_t errors() const { return errors_; }
+    float bitErrorRate() const { return ber_; }
     void reset() {
         memset(normal_, 0, sizeof(normal_)); memset(inverted_, 0, sizeof(inverted_));
-        ptr_ = lastUw_ = misses_ = errors_ = matchErrors_ = 0; sync_ = onInverted_ = false;
+        ptr_ = lastUw_ = misses_ = errors_ = matchErrors_ = 0; sync_ = onInverted_ = false; ber_ = 0;
         type_ = matchType_ = FreeDv2400bFrameType::NONE;
     }
 private:
-    void acquire(bool inverted) { sync_ = true; lastUw_ = misses_ = 0; onInverted_ = inverted; type_ = matchType_; errors_ = matchErrors_; }
+    void acquire(bool inverted) { sync_ = true; lastUw_ = misses_ = 0; onInverted_ = inverted; type_ = matchType_; errors_ = matchErrors_; updateBer(); }
+    void updateBer() { ber_ = .995f * ber_ + .005f * (static_cast<float>(errors_) / 16.0f); }
     bool match(const uint8_t *bits, int tolerance) {
         int voice = 0, data = 0;
         for (int i = 0; i < 16; ++i) {
@@ -95,6 +97,7 @@ private:
     }
     uint8_t normal_[FRAME_BITS], inverted_[FRAME_BITS];
     int ptr_, lastUw_, misses_, errors_, matchErrors_;
+    float ber_;
     bool sync_, onInverted_;
     FreeDv2400bFrameType type_, matchType_;
 };
@@ -137,6 +140,7 @@ public:
         result.framePresent = present; result.synchronized = deframer_.synchronizedNow();
         result.frameType = present ? deframer_.frameType() : FreeDv2400bFrameType::NONE;
         result.uniqueWordErrors = present ? deframer_.errors() : 0;
+        result.bitErrorRate = deframer_.bitErrorRate();
         result.discriminatorSnrDb = snr_; result.clockOffsetPpm = ppm_;
         return true;
     }
@@ -183,4 +187,3 @@ using freedv2400b::FreeDv2400bDecoder;
 using freedv2400b::FreeDv2400bDemodulator;
 using freedv2400b::FreeDv2400bFrameCallback;
 using freedv2400b::FreeDv2400bFrameType;
-

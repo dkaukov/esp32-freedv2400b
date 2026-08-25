@@ -19,6 +19,7 @@ struct FreeDv2400bDecodeResult {
     bool synchronized;
     FreeDv2400bFrameType frameType;
     uint8_t uniqueWordErrors;
+    float bitErrorRate;
     float discriminatorSnrDb;
     float clockOffsetPpm;
 };
@@ -26,4 +27,3 @@ struct FreeDv2400bDecodeResult {
 
 #include "FreeDv2400bModulator.h"
 #include "FreeDv2400bDemodulator.h"
-
