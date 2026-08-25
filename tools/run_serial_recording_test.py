@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# SPDX-License-Identifier: GPL-3.0-only
+# SPDX-License-Identifier: LGPL-2.1-only
 """Stream the real 2400B WAV to an ESP32 and verify all decoded frames."""
 
 import argparse
@@ -18,7 +18,7 @@ import serial
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 WAV = ROOT / "test/fixtures/ve9qrp_2400b.wav"
 FRAMES = ROOT / "test/fixtures/ve9qrp_2400b_voice_frames.bin"
-PROJECT = ROOT / "examples/serial_recording_test"
+PROJECT = ROOT / "test/hil/serial_recording_test"
 
 
 def payload_bit_errors(actual, expected):

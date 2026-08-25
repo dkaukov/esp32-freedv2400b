@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0-only
+// SPDX-License-Identifier: LGPL-2.1-only
 #pragma once
 
 #ifndef FREEDV2400B_PUBLIC_TYPES

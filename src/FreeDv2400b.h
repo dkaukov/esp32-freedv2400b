@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0-only
+// SPDX-License-Identifier: LGPL-2.1-only
 #pragma once
 
 #include <stddef.h>
@@ -19,7 +19,11 @@ struct FreeDv2400bDecodeResult {
     bool synchronized;
     FreeDv2400bFrameType frameType;
     uint8_t uniqueWordErrors;
-    float bitErrorRate;
+    union {
+        float uniqueWordBerEma;
+        // Deprecated compatibility name: this is unique-word BER, not payload BER.
+        float bitErrorRate;
+    };
     float discriminatorSnrDb;
     float clockOffsetPpm;
 };

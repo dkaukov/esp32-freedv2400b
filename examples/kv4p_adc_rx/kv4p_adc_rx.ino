@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0-only
+// SPDX-License-Identifier: LGPL-2.1-only
 // KV4P-HT-compatible ESP32-WROOM ADC receiver example.
 
 #include <Arduino.h>
@@ -20,8 +20,9 @@ static constexpr int PIN_RADIO_PTT = 18;  // Active-low transmit; held high here
 static constexpr int PIN_RADIO_PD = 19;   // Active-high module power enable.
 static constexpr float ADC_BIAS_VOLTS = 1.75f;
 static constexpr float RADIO_FREQUENCY_MHZ = 446.0f;
-// Run examples/kv4p_adc_calibrate to determine this for another ADC/I2S setup.
-static constexpr int ADC_REQUEST_SAMPLE_RATE = 48188;
+// The auto-calibrator is experimental; compare against real RF decoding.
+// Field-tested starting point only; validate on each board and receive path.
+static constexpr int ADC_REQUEST_SAMPLE_RATE = 48400;
 static constexpr float INPUT_GAIN = 16.0f;
 static constexpr float DC_DECAY_SECONDS = 0.25f;
 static constexpr size_t AUDIO_BLOCK_SAMPLES = 256;
@@ -71,7 +72,7 @@ static void onFrame(const uint8_t *payload, size_t length,
   Serial.printf("%s sync=%d uw_errors=%u uw_ber_ema=%.5f snr=%.1f dB clock=%.1f ppm",
                 result.frameType == FreeDv2400bFrameType::VOICE ? "VOICE" : "DATA",
                 result.synchronized, result.uniqueWordErrors,
-                result.bitErrorRate, result.discriminatorSnrDb, result.clockOffsetPpm);
+                result.uniqueWordBerEma, result.discriminatorSnrDb, result.clockOffsetPpm);
   if (result.frameType == FreeDv2400bFrameType::VOICE && length == PAYLOAD_BYTES) {
     ++statsVoiceFrames;
     const uint8_t errors = payloadBitErrors(payload);

@@ -7,8 +7,8 @@ two seconds. A dedicated producer task keeps all eight 256-frame DMA buffers
 fed during the measurement.
 
 ```bash
-pio run -d examples/kv4p_output_clock_test -e dac -t upload --upload-port PORT
-pio run -d examples/kv4p_output_clock_test -e pdm -t upload --upload-port PORT
+pio run -d extras/kv4p/diagnostics/output_clock_test -e dac -t upload --upload-port PORT
+pio run -d extras/kv4p/diagnostics/output_clock_test -e pdm -t upload --upload-port PORT
 ```
 
 DAC uses GPIO25. PDM uses the KV4P pins GPIO25 (data) and GPIO27 (WS). This

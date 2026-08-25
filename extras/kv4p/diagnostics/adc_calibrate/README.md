@@ -4,7 +4,7 @@ This example measures the effective rate of the ESP32 legacy-I2S built-in ADC
 against the ESP32 millisecond timer. No radio signal or second board is needed.
 
 ```bash
-pio run -d examples/kv4p_adc_calibrate -t upload \
+pio run -d extras/kv4p/diagnostics/adc_calibrate -t upload \
   --upload-port /dev/cu.usbserial-5
 pio device monitor -p /dev/cu.usbserial-5 -b 115200
 ```
@@ -18,8 +18,9 @@ recommended = requested * 48000 / measured
 
 The recommendation is rounded to the nearest 10 Hz for repeatability. It then
 restarts the ADC at that rate and performs a second one-second verification.
-The complete procedure takes about 2.2 seconds. Copy the printed value to `ADC_REQUEST_SAMPLE_RATE` in
-`kv4p_adc_rx.ino` and `kv4p_adc_capture.ino`.
+The complete procedure takes about 2.2 seconds. Copy the printed value to
+`ADC_REQUEST_SAMPLE_RATE` in `examples/kv4p_adc_rx/kv4p_adc_rx.ino` and the
+adjacent `adc_capture/adc_capture.ino` diagnostic.
 
 The two tested ESP32-WROOM boards measured about 47,600 sample/s for a 48,000
 request and recommended approximately 48,400. Recalibrate after changing the
@@ -28,6 +29,9 @@ ESP32 family, Arduino core, Audio Tools version, I2S driver, or clock settings.
 This is a practical firmware-clock calibration, not a traceable laboratory
 measurement: the ADC clock and `millis()` are not fully independent. For higher
 confidence, verify with a precise external tone or a separately clocked board.
+
+For repeatable configuration work, prefer the adjacent `adc_auto_calibrate`
+diagnostic. This sketch is retained as a quicker two-pass estimate.
 
 ## DAC and PDM output calibration
 

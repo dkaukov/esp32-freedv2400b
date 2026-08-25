@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0-only
+// SPDX-License-Identifier: LGPL-2.1-only
 // Measure the effective ESP32 legacy-I2S ADC rate and recommend a request rate.
 
 #include <Arduino.h>

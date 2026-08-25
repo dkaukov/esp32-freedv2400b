@@ -1,12 +1,24 @@
 {
   "name": "esp32-freedv2400b",
-  "version": "1.0.2",
+  "version": "1.2.0",
   "description": "FreeDV 2400B raw modem for ESP32 and Arduino",
   "keywords": "esp32, freedv, codec2, modem, digital-voice, ham-radio",
   "repository": { "type": "git", "url": "https://github.com/dkaukov/esp32-freedv2400b" },
   "authors": [{ "name": "Dmitry Kaukov", "maintainer": true }],
-  "license": "GPL-3.0-only",
+  "license": "LGPL-2.1-only",
   "frameworks": "arduino",
   "platforms": "espressif32",
-  "headers": ["FreeDv2400b.h", "FreeDv2400bDemodulator.h", "FreeDv2400bModulator.h"]
+  "headers": ["FreeDv2400b.h", "FreeDv2400bDemodulator.h", "FreeDv2400bModulator.h", "esp32-freedv2400b.h"],
+  "export": {
+    "exclude": [
+      ".github",
+      ".gitignore",
+      ".pio",
+      "**/.pio",
+      "extras",
+      "platformio.ini",
+      "test",
+      "tools"
+    ]
+  }
 }
