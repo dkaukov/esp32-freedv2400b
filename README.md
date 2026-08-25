@@ -4,6 +4,9 @@ A small, dependency-free, header-only FreeDV 2400B raw modem for Arduino and
 PlatformIO. It converts between 48 kHz signed 16-bit discriminator/baseband PCM
 and a 52-bit Codec2 payload packed MSB-first into seven bytes.
 
+Compatible with the FreeDV 2400B implementation in
+[Codec2 1.2.0](https://github.com/drowe67/codec2/tree/1.2.0).
+
 This library implements the FreeDV 2400B modem and Type-A framing layer only.
 **It does not implement Codec2 speech encoding or decoding.**
 
@@ -157,10 +160,16 @@ are excluded from PlatformIO library package exports.
 
 ## Compatibility, provenance, and licence
 
-This is a direct C++ port of `freedv2400b-java`, itself based on Codec2 revision
-`96e8a19c2487fd83bd981ce570f257aef42618f9`. The underlying Codec2/FMFSK and VHF
-Type-A work is associated with David Rowe, with Brady O'Brien identified by
-Codec2 sources where applicable. See [NOTICE](NOTICE) and the
+This library implements the FreeDV 2400B FMFSK modem and VHF Type-A framing
+used by [Codec2 1.2.0](https://github.com/drowe67/codec2/tree/1.2.0). It was
+originally ported through `freedv2400b-java` from Codec2 commit
+`96e8a19c2487fd83bd981ce570f257aef42618f9`; that hash records the exact source
+revision used for the original port, not a separate protocol version or Codec2
+release. The relevant modem behavior is compatible with Codec2 1.2.0.
+
+The underlying Codec2/FMFSK and VHF Type-A work is associated with David Rowe,
+with Brady O'Brien identified by Codec2 sources where applicable. See
+[NOTICE](NOTICE) and the
 [fixture provenance](https://github.com/dkaukov/esp32-freedv2400b/blob/main/test/fixtures/README.md)
 for details.
 

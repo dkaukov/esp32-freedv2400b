@@ -2,10 +2,15 @@ esp32-freedv2400b provenance notice
 ===================================
 
 This implementation is a direct C++ port of freedv2400b-java, which ports the
-FreeDV 2400B modem/framing implementation in the Codec2 project. Compatibility
-is intentionally pinned to Codec2 revision:
+FreeDV 2400B FMFSK modem and VHF Type-A framing in the Codec2 project. The
+relevant implementation is compatible with Codec2 1.2.0:
 
-    96e8a19c2487fd83bd981ce570f257aef42618f9
+    https://github.com/drowe67/codec2/tree/1.2.0
+
+The original port used exact Codec2 source commit
+96e8a19c2487fd83bd981ce570f257aef42618f9. That commit remains recorded as
+precise historical source provenance; it is not a Codec2 release or a distinct
+protocol version.
 
 The underlying Codec2/FMFSK and VHF Type-A work is associated with David Rowe;
 Codec2 sources identify Brady O'Brien as an author where applicable. See the
