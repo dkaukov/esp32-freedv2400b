@@ -5,7 +5,7 @@ Audio Tools ADC path. The ADC configuration matches the receiver:
 
 ```cpp
 config.use_apll = true;
-config.sample_rate = 48188;
+config.sample_rate = 48400;
 ```
 
 That request was measured for the hardware/software configuration used during

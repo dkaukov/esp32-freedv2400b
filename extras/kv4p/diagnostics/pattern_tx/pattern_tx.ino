@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0-only
+// SPDX-License-Identifier: LGPL-2.1-only
 // KV4P-HT-compatible FreeDV 2400B fixed-pattern transmitter.
 
 #include <Arduino.h>

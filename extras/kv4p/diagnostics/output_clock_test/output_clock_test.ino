@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0-only
+// SPDX-License-Identifier: LGPL-2.1-only
 // Measure the ESP32 DAC/PDM clock by counting completed I2S DMA descriptors.
 
 #include <Arduino.h>

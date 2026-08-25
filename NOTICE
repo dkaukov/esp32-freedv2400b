@@ -12,8 +12,10 @@ Codec2 sources identify Brady O'Brien as an author where applicable. See the
 source SPDX headers, LICENSE, and test/fixtures/README.md for repository and
 fixture details.
 
-The repository is distributed under GPL-3.0-only. The provenance of
-ve9qrp_2400b.wav is recorded in test/fixtures/README.md, but its independent
-recording-specific licensing status has not been established in this
-repository. Review that fixture before redistributing it outside this GitHub
-regression-test context.
+The library source is distributed under LGPL-2.1-only. Individual test fixtures
+retain their documented upstream licences; see test/fixtures/README.md.
+
+The historical ve9qrp_2400b.wav fixture traces to drowe67/freedv-gui commit
+49bdffb8de0dff525e99f8156d532b2e73cf1774. This copy was obtained from Fedora
+45 package freedv-1.8.4-13.fc45, whose package metadata declares
+GPL-2.0-or-later. It is excluded from PlatformIO library package exports.

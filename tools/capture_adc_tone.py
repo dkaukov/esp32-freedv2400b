@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# SPDX-License-Identifier: GPL-3.0-only
+# SPDX-License-Identifier: LGPL-2.1-only
 """Capture KV4P Audio Tools ADC PCM, save WAV, and measure a known tone."""
 
 import argparse

@@ -20,11 +20,12 @@ like an RF or BER problem: synchronization slowly walks, frames shift, sync is
 lost, and then it is reacquired.
 
 Calibrate the ADC clock or resample the input close to 48 kHz instead of
-widening the Codec2 timing loop blindly. For KV4P hardware, the recommended
-diagnostic is
-[`adc_auto_calibrate`](https://github.com/dkaukov/esp32-freedv2400b/tree/main/extras/kv4p/diagnostics/adc_auto_calibrate).
-Measured requests such as 48188 or 48400 are board- and configuration-specific,
-not universal settings.
+widening the Codec2 timing loop blindly. KV4P clock tools are collected under
+[`extras/kv4p`](https://github.com/dkaukov/esp32-freedv2400b/tree/main/extras/kv4p).
+The automatic calibrator is experimental: its DMA-EOF clock result has not yet
+correlated reliably with the best real RF decoding. A request of 48400 has
+worked better on the currently tested boards, but it remains a board- and
+configuration-specific starting point, not a universal setting.
 
 `clockOffsetPpm` is the modem timing loop's estimate. Do not treat it as a
 reliable clock measurement when the input clock is already outside the loop's
@@ -39,11 +40,11 @@ lib_deps =
     https://github.com/dkaukov/esp32-freedv2400b.git
 ```
 
-To pin the current published release:
+To pin the planned 1.2.0 version after that tag has been published:
 
 ```ini
 lib_deps =
-    https://github.com/dkaukov/esp32-freedv2400b.git#v1.0.2
+    https://github.com/dkaukov/esp32-freedv2400b.git#v1.2.0
 ```
 
 For Arduino IDE, download the repository release as a ZIP, then select
@@ -163,4 +164,5 @@ Codec2 sources where applicable. See [NOTICE](NOTICE) and the
 [fixture provenance](https://github.com/dkaukov/esp32-freedv2400b/blob/main/test/fixtures/README.md)
 for details.
 
-The repository is licensed GPL-3.0-only.
+The library source is licensed LGPL-2.1-only. Test fixtures retain the licences
+and provenance documented in [test/fixtures/README.md](test/fixtures/README.md).

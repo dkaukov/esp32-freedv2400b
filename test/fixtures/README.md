@@ -8,11 +8,15 @@ generated waveform does not carry separate fixture-specific licensing metadata.
 
 `ve9qrp_2400b.wav` is the real FreeDV recording added by
 [`freedv2400b-java` PR #2](https://github.com/dkaukov/freedv2400b-java/pull/2).
-It comes from the Debian FreeDV 1.4.3 source package and has SHA-256
+It is the historical FreeDV GUI 2400B sample from
+[`drowe67/freedv-gui`](https://github.com/drowe67/freedv-gui), last present at
+commit `49bdffb8de0dff525e99f8156d532b2e73cf1774`. This checked-in
+copy was obtained from Fedora 45 package `freedv-1.8.4-13.fc45`, where it was
+installed as `/usr/share/freedv-gui/wav/ve9qrp_2400b.wav`. Fedora's package
+[`metadata`](https://packages.fedoraproject.org/pkgs/freedv/freedv/) declares
+`GPL-2.0-or-later`; the fixture retains that upstream package
+licence rather than the library's LGPL-2.1-only licence. Its SHA-256 is
 `b14cac59215cef0f8d7ed290145b6fd48198a0ed1288fa7a7e547f32f2a78110`.
-The recording-specific copyright and licence have not been independently
-established in this repository; confirm them before redistribution outside this
-GitHub regression-test context.
 
 `ve9qrp_2400b_voice_frames.bin` contains every voice frame extracted from that
 recording by this modem. It is headerless: exactly 2,810 consecutive records of

@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0-only
+// SPDX-License-Identifier: LGPL-2.1-only
 // One-shot KV4P discriminator capture for host-side modem comparison.
 
 #include <Arduino.h>
@@ -19,7 +19,8 @@ static constexpr int PIN_RADIO_PTT = 18;
 static constexpr int PIN_RADIO_PD = 19;
 static constexpr float ADC_BIAS_VOLTS = 1.75f;
 static constexpr float RADIO_FREQUENCY_MHZ = 446.0f;
-static constexpr int ADC_REQUEST_SAMPLE_RATE = 48188;
+// Field-tested starting point only; validate on each board and receive path.
+static constexpr int ADC_REQUEST_SAMPLE_RATE = 48400;
 static constexpr float INPUT_GAIN = 16.0f;
 static constexpr float DC_DECAY_SECONDS = 0.25f;
 static constexpr size_t CAPTURE_SAMPLES = 10 * SAMPLE_RATE_HZ;

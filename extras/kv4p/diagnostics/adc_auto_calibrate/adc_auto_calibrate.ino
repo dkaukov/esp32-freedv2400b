@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0-only
+// SPDX-License-Identifier: LGPL-2.1-only
 // Automatically find the legacy ESP32 I2S ADC request closest to 48 kHz.
 
 #include <Arduino.h>
@@ -238,8 +238,8 @@ void setup() {
     return;
   }
   Serial.printf(
-      "ADC_AUTO_CAL optimal_request=%d measured_rate=%.3f_sps "
-      "error=%+.1f_ppm overflow=%u dma_error=%u\n",
+      "ADC_AUTO_CAL measured_best_request=%d measured_rate=%.3f_sps "
+      "error=%+.1f_ppm overflow=%u dma_error=%u experimental=1\n",
       best.request, best.rate, best.errorPpm,
       best.overflows, best.dmaErrors);
 }

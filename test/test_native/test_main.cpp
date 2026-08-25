@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0-only
+// SPDX-License-Identifier: LGPL-2.1-only
 #include <unity.h>
 #include <FreeDv2400b.h>
 #include <stdio.h>

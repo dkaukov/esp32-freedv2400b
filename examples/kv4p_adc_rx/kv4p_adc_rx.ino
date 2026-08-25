@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0-only
+// SPDX-License-Identifier: LGPL-2.1-only
 // KV4P-HT-compatible ESP32-WROOM ADC receiver example.
 
 #include <Arduino.h>
@@ -20,8 +20,9 @@ static constexpr int PIN_RADIO_PTT = 18;  // Active-low transmit; held high here
 static constexpr int PIN_RADIO_PD = 19;   // Active-high module power enable.
 static constexpr float ADC_BIAS_VOLTS = 1.75f;
 static constexpr float RADIO_FREQUENCY_MHZ = 446.0f;
-// Run extras/kv4p/diagnostics/adc_auto_calibrate for another ADC/I2S setup.
-static constexpr int ADC_REQUEST_SAMPLE_RATE = 48188;
+// The auto-calibrator is experimental; compare against real RF decoding.
+// Field-tested starting point only; validate on each board and receive path.
+static constexpr int ADC_REQUEST_SAMPLE_RATE = 48400;
 static constexpr float INPUT_GAIN = 16.0f;
 static constexpr float DC_DECAY_SECONDS = 0.25f;
 static constexpr size_t AUDIO_BLOCK_SAMPLES = 256;

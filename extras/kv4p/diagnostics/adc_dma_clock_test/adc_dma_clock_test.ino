@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0-only
+// SPDX-License-Identifier: LGPL-2.1-only
 // Measure the ESP32 legacy I2S ADC clock using completed DMA descriptors.
 
 #include <Arduino.h>
