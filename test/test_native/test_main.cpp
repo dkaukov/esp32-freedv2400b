@@ -18,6 +18,8 @@ static std::vector<int16_t> wav() {
  std::vector<int16_t> v(48000); TEST_ASSERT_EQUAL(48000,fread(v.data(),2,v.size(),f)); fclose(f); return v;
 }
 static std::vector<std::string> got;
+static std::vector<int16_t> txGot;
+static void txCb(const int16_t *samples,size_t count){txGot.insert(txGot.end(),samples,samples+count);}
 static void frameCb(const uint8_t *p,size_t n,const FreeDv2400bDecodeResult&r){
  if(r.frameType==FreeDv2400bFrameType::VOICE){char s[15];for(size_t i=0;i<n;i++)snprintf(s+2*i,3,"%02x",p[i]);got.push_back(s);}
 }
@@ -30,6 +32,13 @@ void test_framing_and_exact_tx(){
  const uint8_t exp[12]={0xa7,0xa7,0x11,0x22,0x33,0x67,0xad,0x44,0x55,0x66,0x72,0x72}; TEST_ASSERT_EQUAL_UINT8_ARRAY(exp,packed,12);
  std::vector<int16_t> v=wav(); int16_t out[1920]; uint8_t p[7]={0xa3,0x15,0x6e,0x07,0xb5,0x05,0xc0}; FreeDv2400bEncoder e; TEST_ASSERT_TRUE(e.encode(p,7,out)); TEST_ASSERT_EQUAL_INT16_ARRAY(v.data(),out,1920);
  p[6]|=15; int16_t alt[1920]; e.encode(p,7,alt); TEST_ASSERT_EQUAL_INT16_ARRAY(out,alt,1920);
+ e.setMagnitude(8191);TEST_ASSERT_EQUAL(8191,e.magnitude());TEST_ASSERT_TRUE(e.encode(p,7,alt));
+ for(size_t i=0;i<1920;i++)TEST_ASSERT_EQUAL_INT16(out[i]>0?8191:-8191,alt[i]);
+ e.setMagnitude(65535);TEST_ASSERT_EQUAL(32767,e.magnitude());TEST_ASSERT_TRUE(e.encode(p,7,alt));
+ for(size_t i=0;i<1920;i++)TEST_ASSERT_EQUAL_INT16(out[i]>0?32767:-32767,alt[i]);
+ txGot.clear();int16_t chunk[17];FreeDv2400bModulator m(txCb);m.setMagnitude(4095);
+ TEST_ASSERT_EQUAL(4095,m.magnitude());TEST_ASSERT_TRUE(m.modulate(p,7,chunk,17));
+ TEST_ASSERT_EQUAL(1920,txGot.size());for(size_t i=0;i<txGot.size();i++)TEST_ASSERT_EQUAL_INT16(out[i]>0?4095:-4095,txGot[i]);
 }
 void test_golden_inverted_chunking_reset(){
  std::vector<int16_t> v=wav(); assertGolden(v); for(size_t i=0;i<v.size();i++)v[i]=-v[i]; const int c[]={1,5,10,159,160,1915,1920,1925}; assertGolden(v,c,8);
@@ -56,6 +65,15 @@ void test_data_no_stale(){
  uint8_t b[96]; detail::VhfTypeAFramer::frame(GOLDEN_PAYLOAD,b);for(int i=0;i<16;i++)b[40+i]=(0xf1fc>>(15-i))&1;
  detail::VhfTypeADeframer d;uint8_t out[7];memset(out,0x5a,7);TEST_ASSERT_TRUE(d.accept(b,out));TEST_ASSERT_EQUAL((int)FreeDv2400bFrameType::DATA,(int)d.frameType());for(int i=0;i<7;i++)TEST_ASSERT_EQUAL_HEX8(0x5a,out[i]);
 }
+void test_codec2_ber_estimate(){
+ uint8_t b[96];detail::VhfTypeAFramer::frame(GOLDEN_PAYLOAD,b);b[40]^=1;
+ detail::VhfTypeADeframer d;uint8_t out[7];TEST_ASSERT_TRUE(d.accept(b,out));
+ float expected=0.005f/16.0f;TEST_ASSERT_FLOAT_WITHIN(0.0000001f,expected,d.bitErrorRate());
+ detail::VhfTypeAFramer::frame(GOLDEN_PAYLOAD,b);for(int i=0;i<8;i++)b[40+i]^=1;
+ TEST_ASSERT_TRUE(d.accept(b,out));expected=.995f*expected+.005f*(d.errors()/16.0f);
+ TEST_ASSERT_FLOAT_WITHIN(0.0000001f,expected,d.bitErrorRate());
+ d.reset();TEST_ASSERT_FLOAT_WITHIN(0.0000001f,0.0f,d.bitErrorRate());
+}
 void test_ve9qrp_recording_sync(){
  FILE *f=fopen("test/fixtures/ve9qrp_2400b.wav","rb");TEST_ASSERT_NOT_NULL(f);TEST_ASSERT_EQUAL(0,fseek(f,44,SEEK_SET));
  FILE *frames=fopen("test/fixtures/ve9qrp_2400b_voice_frames.bin","rb");TEST_ASSERT_NOT_NULL(frames);
@@ -72,4 +90,4 @@ void test_ve9qrp_recording_sync(){
  TEST_ASSERT_EQUAL(2,firstSynchronizedCall);TEST_ASSERT_EQUAL(1,syncAcquisitions);
  TEST_ASSERT_EQUAL(decodeCalls-1,synchronizedCalls);TEST_ASSERT_EQUAL(2810,voiceFrames);TEST_ASSERT_TRUE(result.synchronized);
 }
-int main(int,char**){UNITY_BEGIN();RUN_TEST(test_framing_and_exact_tx);RUN_TEST(test_golden_inverted_chunking_reset);RUN_TEST(test_degraded);RUN_TEST(test_sample_clock_error);RUN_TEST(test_data_no_stale);RUN_TEST(test_ve9qrp_recording_sync);return UNITY_END();}
+int main(int,char**){UNITY_BEGIN();RUN_TEST(test_framing_and_exact_tx);RUN_TEST(test_golden_inverted_chunking_reset);RUN_TEST(test_degraded);RUN_TEST(test_sample_clock_error);RUN_TEST(test_data_no_stale);RUN_TEST(test_codec2_ber_estimate);RUN_TEST(test_ve9qrp_recording_sync);return UNITY_END();}

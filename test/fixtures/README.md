@@ -15,3 +15,11 @@ recording by this modem. It is headerless: exactly 2,810 consecutive records of
 seven bytes each (19,670 bytes total). Each record is the packed, MSB-first
 52-bit Codec2 payload; the low nibble of byte 6 is zero. SHA-256:
 `f2d71011d274bc6d259d16f3db53c596b03ce51c43fd3dc9562d034e6c3c3884`.
+
+`freedv2400b_pattern_11223344556670.wav` is the ten-second pattern played during
+hardware diagnostics: 250 consecutive FreeDV 2400B frames containing the raw
+52-bit payload `11 22 33 44 55 66 70`. It is mono 48 kHz signed 16-bit PCM. The
+sample-exact Codec2 waveform was quantized to signed PCM8 and expanded back to
+signed 16-bit PCM to verify the serial ADC capture format; pinned and latest
+Codec2 both decode all 249 reported frames with zero payload errors. SHA-256:
+`7460dad58f89be5f27e2adb6d1f5d5b32c078ca7c9b3b40d27f19969dfcb5260`.
