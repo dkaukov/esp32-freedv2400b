@@ -36,23 +36,26 @@ tracking range.
 
 ## Installation
 
-For PlatformIO, add the Git repository directly:
+The library is published in the
+[PlatformIO Registry](https://registry.platformio.org/libraries/dkaukov/esp32-freedv2400b).
+Add it to `platformio.ini` with a compatible-version constraint:
 
 ```ini
 lib_deps =
-    https://github.com/dkaukov/esp32-freedv2400b.git
+    dkaukov/esp32-freedv2400b @ ^1.2.0
 ```
 
-To pin the planned 1.2.0 version after that tag has been published:
+To pin the exact release instead:
 
 ```ini
 lib_deps =
-    https://github.com/dkaukov/esp32-freedv2400b.git#v1.2.0
+    dkaukov/esp32-freedv2400b @ 1.2.0
 ```
 
-For Arduino IDE, download the repository release as a ZIP, then select
-**Sketch > Include Library > Add .ZIP Library**. This README does not assume the
-library is listed in PlatformIO Registry or Arduino Library Manager.
+For Arduino IDE, download the
+[GitHub release](https://github.com/dkaukov/esp32-freedv2400b/releases/latest)
+as a ZIP, then select **Sketch > Include Library > Add .ZIP Library**. The
+library is not currently listed in Arduino Library Manager.
 
 ## Receive
 
