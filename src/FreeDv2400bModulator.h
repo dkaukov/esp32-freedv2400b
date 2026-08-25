@@ -32,7 +32,12 @@ private:
 
 class FreeDv2400bEncoder {
 public:
+    FreeDv2400bEncoder() : magnitude_(16383) {}
     int outputSamples() const { return TX_SAMPLES; }
+    void setMagnitude(uint16_t magnitude) {
+        magnitude_ = static_cast<int16_t>(magnitude > 32767 ? 32767 : magnitude);
+    }
+    int16_t magnitude() const { return magnitude_; }
     bool encode(const uint8_t *payload, size_t length, int16_t *output,
                 size_t capacity = TX_SAMPLES) {
         if (!payload || length < PAYLOAD_BYTES || !output || capacity < TX_SAMPLES) return false;
@@ -40,20 +45,28 @@ public:
         detail::VhfTypeAFramer::frame(payload, bits);
         size_t p = 0;
         for (int i = 0; i < FRAME_BITS; ++i) {
-            const int16_t a = bits[i] ? 16383 : -16383;
+            const int16_t a = bits[i] ? magnitude_ : static_cast<int16_t>(-magnitude_);
             for (int j = 0; j < 10; ++j) output[p++] = a;
             for (int j = 0; j < 10; ++j) output[p++] = static_cast<int16_t>(-a);
         }
         return true;
     }
     void reset() {}
+private:
+    int16_t magnitude_;
 };
 
 typedef void (*FreeDv2400bSampleCallback)(const int16_t *samples, size_t count);
 
 class FreeDv2400bModulator {
 public:
-    explicit FreeDv2400bModulator(FreeDv2400bSampleCallback callback = 0) : callback_(callback) {}
+    explicit FreeDv2400bModulator(FreeDv2400bSampleCallback callback = 0)
+        : callback_(callback), magnitude_(16383) {}
+
+    void setMagnitude(uint16_t magnitude) {
+        magnitude_ = static_cast<int16_t>(magnitude > 32767 ? 32767 : magnitude);
+    }
+    int16_t magnitude() const { return magnitude_; }
 
     bool modulate(const uint8_t *payload, size_t length, int16_t *buffer, size_t chunkSize) {
         if (!payload || length < PAYLOAD_BYTES || !buffer || !chunkSize || !callback_) return false;
@@ -61,7 +74,7 @@ public:
         detail::VhfTypeAFramer::frame(payload, bits);
         size_t used = 0;
         for (int bit = 0; bit < FRAME_BITS; ++bit) {
-            const int16_t a = bits[bit] ? 16383 : -16383;
+            const int16_t a = bits[bit] ? magnitude_ : static_cast<int16_t>(-magnitude_);
             for (int half = 0; half < 2; ++half) {
                 const int16_t level = half ? static_cast<int16_t>(-a) : a;
                 for (int j = 0; j < 10; ++j) {
@@ -76,6 +89,7 @@ public:
     void reset() {}
 private:
     FreeDv2400bSampleCallback callback_;
+    int16_t magnitude_;
 };
 }
 
