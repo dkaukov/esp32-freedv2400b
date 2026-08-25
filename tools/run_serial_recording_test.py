@@ -10,6 +10,7 @@ import subprocess
 import sys
 import time
 import wave
+from collections import Counter
 
 import serial
 
@@ -18,6 +19,12 @@ ROOT = pathlib.Path(__file__).resolve().parents[1]
 WAV = ROOT / "test/fixtures/ve9qrp_2400b.wav"
 FRAMES = ROOT / "test/fixtures/ve9qrp_2400b_voice_frames.bin"
 PROJECT = ROOT / "examples/serial_recording_test"
+
+
+def payload_bit_errors(actual, expected):
+    """Count errors in the six full bytes and high nibble containing 52 bits."""
+    errors = sum(bin(a ^ b).count("1") for a, b in zip(actual[:6], expected[:6]))
+    return errors + bin((actual[6] ^ expected[6]) & 0xF0).count("1")
 
 
 def read_protocol_line(port, deadline):
@@ -36,6 +43,8 @@ def main():
     parser.add_argument("--environment", default="esp32dev")
     parser.add_argument("--pio", default=shutil.which("pio") or "pio")
     parser.add_argument("--skip-upload", action="store_true")
+    parser.add_argument("--report-frames", action="store_true",
+                        help="print UW and known-payload BER for every voice frame")
     args = parser.parse_args()
 
     if not args.skip_upload:
@@ -62,6 +71,9 @@ def main():
         port.write(struct.pack("<I", sample_count))
 
         offset = calls = synchronized_calls = acquisitions = first_sync = voices = 0
+        total_payload_errors = mismatched_frames = 0
+        frame_ber_counts = Counter()
+        first_mismatch = None
         previously_synchronized = False
         started = time.monotonic()
         deadline = started + 240
@@ -88,9 +100,19 @@ def main():
                         if not first_sync:
                             first_sync = calls
                 if present and frame_type == 1:
-                    wanted = expected[voices * 7:(voices + 1) * 7].hex()
-                    if payload != wanted:
-                        raise AssertionError(f"voice frame {voices} differs: {payload} != {wanted}")
+                    wanted_bytes = expected[voices * 7:(voices + 1) * 7]
+                    actual_bytes = bytes.fromhex(payload)
+                    payload_errors = payload_bit_errors(actual_bytes, wanted_bytes)
+                    total_payload_errors += payload_errors
+                    frame_ber_counts[(errors, payload_errors)] += 1
+                    if args.report_frames:
+                        print(f"FRAME={voices} uw_errors={errors}/16 "
+                              f"payload_errors={payload_errors}/52 "
+                              f"payload_ber={payload_errors / 52.0:.6f}")
+                    if payload_errors:
+                        mismatched_frames += 1
+                        if first_mismatch is None:
+                            first_mismatch = (voices, payload, wanted_bytes.hex())
                     voices += 1
                 previously_synchronized = bool(synchronized)
             elif line.startswith("DONE="):
@@ -104,6 +126,15 @@ def main():
     assert voices == 2810, voices
     assert previously_synchronized
     elapsed = time.monotonic() - started
+    for (uw_errors, payload_errors), count in sorted(frame_ber_counts.items()):
+        print(f"FRAME_BER uw_errors={uw_errors}/16 payload_errors={payload_errors}/52 "
+              f"payload_ber={payload_errors / 52.0:.6f} frames={count}")
+    print(f"PAYLOAD_BER total_errors={total_payload_errors}/{voices * 52} "
+          f"ber={total_payload_errors / (voices * 52):.9f} "
+          f"mismatched_frames={mismatched_frames}")
+    if first_mismatch is not None:
+        frame, actual, wanted = first_mismatch
+        raise AssertionError(f"voice frame {frame} differs: {actual} != {wanted}")
     print(f"PASS calls={calls} voices={voices} first_sync={first_sync} acquisitions={acquisitions}")
     print(f"pcm_bytes={len(pcm)} serial_test_sec={elapsed:.3f}")
 
