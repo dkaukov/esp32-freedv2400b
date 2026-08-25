@@ -1,0 +1,19 @@
+esp32-freedv2400b provenance notice
+===================================
+
+This implementation is a direct C++ port of freedv2400b-java, which ports the
+FreeDV 2400B modem/framing implementation in the Codec2 project. Compatibility
+is intentionally pinned to Codec2 revision:
+
+    96e8a19c2487fd83bd981ce570f257aef42618f9
+
+The underlying Codec2/FMFSK and VHF Type-A work is associated with David Rowe;
+Codec2 sources identify Brady O'Brien as an author where applicable. See the
+source SPDX headers, LICENSE, and test/fixtures/README.md for repository and
+fixture details.
+
+The repository is distributed under GPL-3.0-only. The provenance of
+ve9qrp_2400b.wav is recorded in test/fixtures/README.md, but its independent
+recording-specific licensing status has not been established in this
+repository. Review that fixture before redistributing it outside this GitHub
+regression-test context.

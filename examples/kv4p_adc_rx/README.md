@@ -13,6 +13,12 @@ This example follows the ESP32-WROOM RX audio path in KV4P-HT's `rxAudio.h`:
 The ADC is sampled continuously; this example does not use or require the
 KV4P-HT hardware squelch signal.
 
+The checked-in ADC request is a measured value for a particular board and
+software configuration, not a universal ESP32 setting. Run the recommended
+[`adc_auto_calibrate`](https://github.com/dkaukov/esp32-freedv2400b/tree/main/extras/kv4p/diagnostics/adc_auto_calibrate)
+diagnostic or resample the input close to 48 kHz. A 48,000 request measured
+about 47,600 sample/s on tested boards, outside the modem timing range.
+
 UART0 uses an 8 KiB transmit buffer and 1 KiB receive buffer so diagnostic
 frame logging does not stall the ADC/decode loop during short bursts.
 

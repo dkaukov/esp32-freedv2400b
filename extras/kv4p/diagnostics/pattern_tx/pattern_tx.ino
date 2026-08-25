@@ -9,6 +9,10 @@
 using namespace freedv2400b;
 using namespace audio_tools;
 
+#ifndef ENABLE_RF_TX
+#define ENABLE_RF_TX 0
+#endif
+
 static constexpr int PIN_AUDIO_OUT = 25;  // ESP32 DAC channel 1 to SA818 mic.
 static constexpr int PIN_RADIO_RX = 16;
 static constexpr int PIN_RADIO_TX = 17;
@@ -100,6 +104,12 @@ void setup() {
   Serial.begin(115200);
   delay(250);
   Serial.println("FreeDV 2400B KV4P fixed-pattern transmitter");
+  pinMode(PIN_RADIO_PTT, OUTPUT);
+  digitalWrite(PIN_RADIO_PTT, HIGH);
+#if !ENABLE_RF_TX
+  Serial.println("RF transmission disabled; rebuild with ENABLE_RF_TX=1 to opt in");
+  return;
+#else
   if (!configureRadio() || !beginAudioOutput()) {
     Serial.println("SA818 or DAC initialization failed");
     while (true) delay(1000);
@@ -107,9 +117,14 @@ void setup() {
   modulator.setMagnitude(TX_MAGNITUDE);
   Serial.printf("SA818 %.4f MHz, 25 kHz wide, filters off, TX magnitude %u\n",
                 RADIO_FREQUENCY_MHZ, TX_MAGNITUDE);
+#endif
 }
 
 void loop() {
+#if ENABLE_RF_TX
   transmitBurst();
   delay(RX_INTERVAL_MS);
+#else
+  delay(1000);
+#endif
 }

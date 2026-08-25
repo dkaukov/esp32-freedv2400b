@@ -14,7 +14,7 @@ import numpy as np
 import serial
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
-PROJECT = ROOT / "examples/kv4p_adc_capture"
+PROJECT = ROOT / "extras/kv4p/diagnostics/adc_capture"
 NOMINAL_RATE = 48000
 
 

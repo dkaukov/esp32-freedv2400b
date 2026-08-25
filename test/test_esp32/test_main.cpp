@@ -30,9 +30,10 @@ static void test_codec2_flash_vector_and_speed() {
   const uint8_t expected[7] = {0xa3,0x15,0x6e,0x07,0xb5,0x05,0xc0};
   TEST_ASSERT_TRUE(present);
   TEST_ASSERT_EQUAL_UINT8_ARRAY(expected, received, 7);
-  TEST_ASSERT_LESS_THAN(80000, elapsed); // 40 ms audio; comfortably faster than real time.
-  Serial.printf("audio_sec=0.040 decode_sec=%.6f rt_factor=%.3f cpu_pct=%.1f\n",
-                elapsed / 1000000.0, elapsed / 40000.0, elapsed / 400.0);
+  // Two 1,920-sample frames are 80 ms of audio. Require at least 2x real time.
+  TEST_ASSERT_LESS_THAN(40000, elapsed);
+  Serial.printf("audio_sec=0.080 decode_sec=%.6f rt_factor=%.3f cpu_pct=%.1f\n",
+                elapsed / 1000000.0, elapsed / 80000.0, elapsed / 800.0);
 }
 void setup() { delay(1000); UNITY_BEGIN(); RUN_TEST(test_codec2_flash_vector_and_speed); UNITY_END(); }
 void loop() {}

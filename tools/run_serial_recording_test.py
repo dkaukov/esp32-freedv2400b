@@ -18,7 +18,7 @@ import serial
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 WAV = ROOT / "test/fixtures/ve9qrp_2400b.wav"
 FRAMES = ROOT / "test/fixtures/ve9qrp_2400b_voice_frames.bin"
-PROJECT = ROOT / "examples/serial_recording_test"
+PROJECT = ROOT / "test/hil/serial_recording_test"
 
 
 def payload_bit_errors(actual, expected):

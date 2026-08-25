@@ -6,10 +6,10 @@ Measures the ESP32 legacy I2S ADC sample rate by counting
 The report also includes RX queue overflow and DMA error counts.
 
 ```bash
-pio run -d examples/kv4p_adc_dma_clock_test -e request_48000 -t upload --upload-port PORT
-pio run -d examples/kv4p_adc_dma_clock_test -e request_48400 -t upload --upload-port PORT
-pio run -d examples/kv4p_adc_dma_clock_test -e request_48188 -t upload --upload-port PORT
-pio run -d examples/kv4p_adc_dma_clock_test -e request_48190 -t upload --upload-port PORT
+pio run -d extras/kv4p/diagnostics/adc_dma_clock_test -e request_48000 -t upload --upload-port PORT
+pio run -d extras/kv4p/diagnostics/adc_dma_clock_test -e request_48400 -t upload --upload-port PORT
+pio run -d extras/kv4p/diagnostics/adc_dma_clock_test -e request_48188 -t upload --upload-port PORT
+pio run -d extras/kv4p/diagnostics/adc_dma_clock_test -e request_48190 -t upload --upload-port PORT
 ```
 
 The KV4P audio input is GPIO34. GPIO26 supplies the normal 1.75 V ADC bias.

@@ -68,7 +68,9 @@ public:
     bool synchronizedNow() const { return sync_; }
     FreeDv2400bFrameType frameType() const { return type_; }
     uint8_t errors() const { return errors_; }
-    float bitErrorRate() const { return ber_; }
+    float uniqueWordBerEma() const { return ber_; }
+    // Deprecated compatibility accessor.
+    float bitErrorRate() const { return uniqueWordBerEma(); }
     void reset() {
         memset(normal_, 0, sizeof(normal_)); memset(inverted_, 0, sizeof(inverted_));
         ptr_ = lastUw_ = misses_ = errors_ = matchErrors_ = 0; sync_ = onInverted_ = false; ber_ = 0;
@@ -140,7 +142,7 @@ public:
         result.framePresent = present; result.synchronized = deframer_.synchronizedNow();
         result.frameType = present ? deframer_.frameType() : FreeDv2400bFrameType::NONE;
         result.uniqueWordErrors = present ? deframer_.errors() : 0;
-        result.bitErrorRate = deframer_.bitErrorRate();
+        result.uniqueWordBerEma = deframer_.uniqueWordBerEma();
         result.discriminatorSnrDb = snr_; result.clockOffsetPpm = ppm_;
         return true;
     }

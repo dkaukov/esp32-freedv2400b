@@ -68,11 +68,14 @@ void test_data_no_stale(){
 void test_codec2_ber_estimate(){
  uint8_t b[96];detail::VhfTypeAFramer::frame(GOLDEN_PAYLOAD,b);b[40]^=1;
  detail::VhfTypeADeframer d;uint8_t out[7];TEST_ASSERT_TRUE(d.accept(b,out));
- float expected=0.005f/16.0f;TEST_ASSERT_FLOAT_WITHIN(0.0000001f,expected,d.bitErrorRate());
+ float expected=0.005f/16.0f;TEST_ASSERT_FLOAT_WITHIN(0.0000001f,expected,d.uniqueWordBerEma());
  detail::VhfTypeAFramer::frame(GOLDEN_PAYLOAD,b);for(int i=0;i<8;i++)b[40+i]^=1;
  TEST_ASSERT_TRUE(d.accept(b,out));expected=.995f*expected+.005f*(d.errors()/16.0f);
- TEST_ASSERT_FLOAT_WITHIN(0.0000001f,expected,d.bitErrorRate());
- d.reset();TEST_ASSERT_FLOAT_WITHIN(0.0000001f,0.0f,d.bitErrorRate());
+ TEST_ASSERT_FLOAT_WITHIN(0.0000001f,expected,d.uniqueWordBerEma());
+ d.reset();TEST_ASSERT_FLOAT_WITHIN(0.0000001f,0.0f,d.uniqueWordBerEma());
+ FreeDv2400bDecodeResult result={};result.uniqueWordBerEma=.25f;
+ TEST_ASSERT_FLOAT_WITHIN(0.0000001f,.25f,result.bitErrorRate);
+ result.bitErrorRate=.5f;TEST_ASSERT_FLOAT_WITHIN(0.0000001f,.5f,result.uniqueWordBerEma);
 }
 void test_ve9qrp_recording_sync(){
  FILE *f=fopen("test/fixtures/ve9qrp_2400b.wav","rb");TEST_ASSERT_NOT_NULL(f);TEST_ASSERT_EQUAL(0,fseek(f,44,SEEK_SET));

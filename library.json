@@ -8,5 +8,17 @@
   "license": "GPL-3.0-only",
   "frameworks": "arduino",
   "platforms": "espressif32",
-  "headers": ["FreeDv2400b.h", "FreeDv2400bDemodulator.h", "FreeDv2400bModulator.h"]
+  "headers": ["FreeDv2400b.h", "FreeDv2400bDemodulator.h", "FreeDv2400bModulator.h", "esp32-freedv2400b.h"],
+  "export": {
+    "exclude": [
+      ".github",
+      ".gitignore",
+      ".pio",
+      "**/.pio",
+      "extras",
+      "platformio.ini",
+      "test",
+      "tools"
+    ]
+  }
 }

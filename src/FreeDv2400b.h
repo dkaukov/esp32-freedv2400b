@@ -19,7 +19,11 @@ struct FreeDv2400bDecodeResult {
     bool synchronized;
     FreeDv2400bFrameType frameType;
     uint8_t uniqueWordErrors;
-    float bitErrorRate;
+    union {
+        float uniqueWordBerEma;
+        // Deprecated compatibility name: this is unique-word BER, not payload BER.
+        float bitErrorRate;
+    };
     float discriminatorSnrDb;
     float clockOffsetPpm;
 };
