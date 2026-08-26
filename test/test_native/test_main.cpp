@@ -77,6 +77,20 @@ void test_codec2_ber_estimate(){
  TEST_ASSERT_FLOAT_WITHIN(0.0000001f,.25f,result.bitErrorRate);
  result.bitErrorRate=.5f;TEST_ASSERT_FLOAT_WITHIN(0.0000001f,.5f,result.uniqueWordBerEma);
 }
+void test_continuous_demodulator_stats(){
+ FreeDv2400bDemodulator d;TEST_ASSERT_FALSE(d.hasDecodeResult());TEST_ASSERT_FLOAT_WITHIN(.0001f,0,d.discriminatorSnrDbNow());
+ std::vector<int16_t> zero(1920,0);d.processSamples(zero.data(),zero.size());TEST_ASSERT_TRUE(d.hasDecodeResult());
+ TEST_ASSERT_FALSE(d.lastDecodeResult().framePresent);TEST_ASSERT_FLOAT_WITHIN(.001f,-4.9136f,d.discriminatorSnrDbNow());
+ TEST_ASSERT_FLOAT_WITHIN(.0001f,d.lastDecodeResult().discriminatorSnrDb,d.discriminatorSnrDbNow());
+ d.reset();TEST_ASSERT_FALSE(d.hasDecodeResult());TEST_ASSERT_FALSE(d.synchronizedNow());
+ std::vector<int16_t> noise(48000*10);uint32_t state=0x12345678;
+ for(size_t i=0;i<noise.size();i++){state=state*1664525u+1013904223u;noise[i]=(int16_t)(((int32_t)(state>>16)-32768)*1000/32768);}
+ d.processSamples(noise.data(),noise.size());TEST_ASSERT_TRUE(d.hasDecodeResult());
+ TEST_ASSERT_FLOAT_WITHIN(.25f,4.46f,d.discriminatorSnrDbNow());
+ d.reset();std::vector<int16_t> ideal=wav();d.processSamples(ideal.data(),ideal.size());
+ TEST_ASSERT_TRUE(d.hasDecodeResult());TEST_ASSERT_TRUE(d.synchronizedNow());TEST_ASSERT_GREATER_THAN(40.0f,d.discriminatorSnrDbNow());
+ TEST_ASSERT_EQUAL((int)FreeDv2400bFrameType::VOICE,(int)d.lastDecodeResult().frameType);
+}
 void test_ve9qrp_recording_sync(){
  FILE *f=fopen("test/fixtures/ve9qrp_2400b.wav","rb");TEST_ASSERT_NOT_NULL(f);TEST_ASSERT_EQUAL(0,fseek(f,44,SEEK_SET));
  FILE *frames=fopen("test/fixtures/ve9qrp_2400b_voice_frames.bin","rb");TEST_ASSERT_NOT_NULL(frames);
@@ -93,4 +107,4 @@ void test_ve9qrp_recording_sync(){
  TEST_ASSERT_EQUAL(2,firstSynchronizedCall);TEST_ASSERT_EQUAL(1,syncAcquisitions);
  TEST_ASSERT_EQUAL(decodeCalls-1,synchronizedCalls);TEST_ASSERT_EQUAL(2810,voiceFrames);TEST_ASSERT_TRUE(result.synchronized);
 }
-int main(int,char**){UNITY_BEGIN();RUN_TEST(test_framing_and_exact_tx);RUN_TEST(test_golden_inverted_chunking_reset);RUN_TEST(test_degraded);RUN_TEST(test_sample_clock_error);RUN_TEST(test_data_no_stale);RUN_TEST(test_codec2_ber_estimate);RUN_TEST(test_ve9qrp_recording_sync);return UNITY_END();}
+int main(int,char**){UNITY_BEGIN();RUN_TEST(test_framing_and_exact_tx);RUN_TEST(test_golden_inverted_chunking_reset);RUN_TEST(test_degraded);RUN_TEST(test_sample_clock_error);RUN_TEST(test_data_no_stale);RUN_TEST(test_codec2_ber_estimate);RUN_TEST(test_continuous_demodulator_stats);RUN_TEST(test_ve9qrp_recording_sync);return UNITY_END();}
