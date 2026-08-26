@@ -42,14 +42,14 @@ Add it to `platformio.ini` with a compatible-version constraint:
 
 ```ini
 lib_deps =
-    dkaukov/esp32-freedv2400b @ ^1.2.0
+    dkaukov/esp32-freedv2400b @ ^1.3.0
 ```
 
 To pin the exact release instead:
 
 ```ini
 lib_deps =
-    dkaukov/esp32-freedv2400b @ 1.2.0
+    dkaukov/esp32-freedv2400b @ 1.3.0
 ```
 
 For Arduino IDE, download the

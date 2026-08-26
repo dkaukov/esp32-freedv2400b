@@ -1,6 +1,6 @@
 {
   "name": "esp32-freedv2400b",
-  "version": "1.2.0",
+  "version": "1.3.0",
   "description": "FreeDV 2400B raw modem for ESP32 and Arduino",
   "keywords": "esp32, freedv, codec2, modem, digital-voice, ham-radio",
   "repository": { "type": "git", "url": "https://github.com/dkaukov/esp32-freedv2400b" },
