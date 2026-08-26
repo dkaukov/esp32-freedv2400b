@@ -110,6 +110,8 @@ public:
     FreeDv2400bDecoder() { reset(); }
     int inputSamplesRequired() const { return required_; }
     int maximumInputSamples() const { return MAX_RX_INPUT; }
+    float discriminatorSnrDbNow() const { return snr_; }
+    float clockOffsetPpmNow() const { return ppm_; }
     bool decode(const int16_t *input, size_t count, uint8_t *payload, FreeDv2400bDecodeResult &result) {
         if (!input || count < static_cast<size_t>(required_) || !payload) return false;
         const int retained = 1960 - required_, tailOffset = 45 - retained;
@@ -160,7 +162,7 @@ typedef void (*FreeDv2400bFrameCallback)(const uint8_t *, size_t, const FreeDv24
 
 class FreeDv2400bDemodulator {
 public:
-    explicit FreeDv2400bDemodulator(FreeDv2400bFrameCallback callback = 0) : callback_(callback), buffered_(0), sync_(false) {}
+    explicit FreeDv2400bDemodulator(FreeDv2400bFrameCallback callback = 0) : callback_(callback) { reset(); }
     void processSamples(const int16_t *samples, size_t count) {
         if (!samples) return;
         while (count) {
@@ -168,19 +170,27 @@ public:
             size_t n = count < need ? count : need;
             memcpy(fifo_ + buffered_, samples, n * sizeof(int16_t)); buffered_ += n; samples += n; count -= n;
             if (buffered_ == static_cast<size_t>(decoder_.inputSamplesRequired())) {
-                FreeDv2400bDecodeResult r;
-                decoder_.decode(fifo_, buffered_, payload_, r); buffered_ = 0; sync_ = r.synchronized;
-                if (r.framePresent && callback_) callback_(payload_, r.frameType == FreeDv2400bFrameType::VOICE ? PAYLOAD_BYTES : 0, r);
+                decoder_.decode(fifo_, buffered_, payload_, lastResult_); buffered_ = 0; hasResult_ = true;
+                sync_ = lastResult_.synchronized;
+                if (lastResult_.framePresent && callback_) callback_(payload_, lastResult_.frameType == FreeDv2400bFrameType::VOICE ? PAYLOAD_BYTES : 0, lastResult_);
             }
         }
     }
     void processSample(int16_t sample) { processSamples(&sample, 1); }
-    void reset() { decoder_.reset(); buffered_ = 0; sync_ = false; memset(payload_, 0, sizeof(payload_)); }
+    void reset() {
+        decoder_.reset(); buffered_ = 0; sync_ = hasResult_ = false;
+        memset(payload_, 0, sizeof(payload_)); memset(&lastResult_, 0, sizeof(lastResult_));
+    }
     bool synchronizedNow() const { return sync_; }
+    bool hasDecodeResult() const { return hasResult_; }
+    float discriminatorSnrDbNow() const { return lastResult_.discriminatorSnrDb; }
+    float clockOffsetPpmNow() const { return lastResult_.clockOffsetPpm; }
+    const FreeDv2400bDecodeResult &lastDecodeResult() const { return lastResult_; }
     size_t bufferedSamples() const { return buffered_; }
 private:
     FreeDv2400bDecoder decoder_; FreeDv2400bFrameCallback callback_;
-    int16_t fifo_[MAX_RX_INPUT]; uint8_t payload_[PAYLOAD_BYTES]; size_t buffered_; bool sync_;
+    int16_t fifo_[MAX_RX_INPUT]; uint8_t payload_[PAYLOAD_BYTES]; FreeDv2400bDecodeResult lastResult_;
+    size_t buffered_; bool sync_, hasResult_;
 };
 }
 

@@ -90,6 +90,13 @@ pointers are borrowed and valid only for the duration of the callback.
 it is not payload BER. The old `bitErrorRate` name remains as a deprecated
 source-compatibility alias to the same stored value.
 
+The frame callback still runs only for scheduled VOICE or DATA frames. For a
+continuously updated modem estimate, poll `hasDecodeResult()`,
+`discriminatorSnrDbNow()`, `clockOffsetPpmNow()`, or `lastDecodeResult()`.
+These values update after every decoder call (approximately every 40 ms), even
+when no frame is present. They reset to zero and become invalid until
+`hasDecodeResult()` returns true again.
+
 The receiver preserves Codec2 Type-A behavior, including normal/inverted
 polarity acquisition and continued scheduled extraction after missed unique
 words until the miss tolerance is exceeded.
@@ -123,8 +130,9 @@ integer TX magnitude from 0 through 32767 without changing the default waveform.
 ## Memory and platforms
 
 Modem RX/TX processing performs no heap allocation. The decoder is approximately
-8 KiB. `FreeDv2400bDemodulator` is 12068 bytes on the tested 32-bit ESP32 ABI,
-including its 3850-byte streaming FIFO, so instantiate it globally or statically.
+8 KiB. `FreeDv2400bDemodulator` is 12084 bytes on the tested 32-bit ESP32 ABI,
+including its 3850-byte streaming FIFO and latest result, so instantiate it
+globally or statically.
 
 CI builds the core library for ESP32, ESP32-S3, and ESP32-C3 with Arduino. The
 core headers do not call ESP32-specific APIs.
