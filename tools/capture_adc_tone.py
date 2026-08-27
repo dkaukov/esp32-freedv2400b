@@ -19,12 +19,15 @@ NOMINAL_RATE = 48000
 
 
 def read_capture(port):
-    time.sleep(9.0)  # Firmware discards uploader residue for eight seconds.
+    time.sleep(11.0)  # Radio startup plus firmware's uploader-residue delay.
     port.reset_input_buffer()
-    port.write(b"GO!\n")
     framing = bytearray()
-    deadline = time.monotonic() + 5.0
+    deadline = time.monotonic() + 10.0
+    next_trigger = 0.0
     while b"ADC8" not in framing and time.monotonic() < deadline:
+        if time.monotonic() >= next_trigger:
+            port.write(b"GO!\n")
+            next_trigger = time.monotonic() + 1.0
         framing.extend(port.read(4096))
         if len(framing) > 65536:
             del framing[:-8]
@@ -73,7 +76,11 @@ def main():
     parser.add_argument("--port", required=True)
     parser.add_argument("--output", type=pathlib.Path,
                         default=pathlib.Path("adc_1200hz.wav"))
+    parser.add_argument("--raw-output", type=pathlib.Path,
+                        help="also save headerless signed PCM8 samples")
     parser.add_argument("--tone-hz", type=float, default=1200.0)
+    parser.add_argument("--skip-tone-analysis", action="store_true",
+                        help="save arbitrary PCM without looking for a tone")
     parser.add_argument("--pio", default=shutil.which("pio") or "pio")
     parser.add_argument("--skip-upload", action="store_true")
     parser.add_argument("--inject-tone", action="store_true",
@@ -98,8 +105,13 @@ def main():
         output.setsampwidth(1)
         output.setframerate(NOMINAL_RATE)
         output.writeframes(bytes((value + 128) & 0xFF for value in pcm))
-    measured, effective, ppm, rms = measure_tone(pcm, args.tone_hz)
+    if args.raw_output:
+        args.raw_output.parent.mkdir(parents=True, exist_ok=True)
+        args.raw_output.write_bytes(pcm)
     print(f"WAV={args.output} samples={len(pcm)} nominal_rate={NOMINAL_RATE}")
+    if args.skip_tone_analysis:
+        return
+    measured, effective, ppm, rms = measure_tone(pcm, args.tone_hz)
     print(f"TONE expected={args.tone_hz:.6f}_Hz measured={measured:.6f}_Hz rms={rms:.3f}")
     if args.inject_tone:
         print("MODE=injected_tone result validates PCM ordering/capture, not ADC clock")

@@ -23,6 +23,14 @@ steady-state tone, and reports inferred ADC sample rate and clock error. It
 requires `pyserial` and `numpy`. A digitally inserted tone would not measure
 the physical ADC clock.
 
+For arbitrary discriminator audio rather than a calibration tone, use
+`--skip-tone-analysis`. Add `--raw-output FILE` to retain the same samples as
+headerless signed PCM8. Hardware captures retained for analysis are documented
+under `captures/`.
+
+See [SNR_EXPERIMENTS.md](SNR_EXPERIMENTS.md) for the saved RF-path measurements
+and a reproducible host-side filtering/noise experiment.
+
 To keep the real ADC read loop but replace every ADC value with a digitally
 generated 1200 Hz waveform based on a nominal 48 kHz phase step:
 
