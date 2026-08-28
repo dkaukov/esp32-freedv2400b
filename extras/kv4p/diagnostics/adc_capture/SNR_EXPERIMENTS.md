@@ -48,37 +48,3 @@ provides about 10 dB processing gain for white noise, while deterministic
 filter distortion remains as a roughly 16-17 dB ceiling. On the tested KV4P
 path, approximately 4-6 dB represents noise and 16-17 dB represents the
 practical maximum. Treat those values as hardware-specific calibration.
-
-## Symbol-model experiment
-
-`tools/analyze_symbol_models.cpp` compares three experimental estimators using
-the decoder's adaptive 10-sample chip windows. Run it with:
-
-```bash
-g++ -std=c++11 -O2 -Isrc tools/analyze_symbol_models.cpp \
-  -o /tmp/analyze_symbol_models
-/tmp/analyze_symbol_models
-```
-
-| Input | Polarity regression | Per-chip ramp | Transition templates |
-|---|---:|---:|---:|
-| Exact Codec2 waveform | infinite | infinite | 54.17 dB |
-| 200-4000 Hz band-pass | 9.50 dB | 11.28 dB | 15.73 dB |
-| Band-pass + 20% AWGN | 7.53 dB | 9.16 dB | 10.65 dB |
-| Band-pass + 50% AWGN | 2.99 dB | 4.62 dB | 4.12 dB |
-| Captured KV4P RF path | 5.66 dB | 8.33 dB | 8.55 dB |
-
-The polarity model fits one global `sample = a * polarity + b` model. The ramp
-model fits `sample = a * time + b` independently inside every chip; it removes
-transition slope, but its two fitted parameters per ten samples also absorb
-noise and therefore make its SNR optimistic.
-
-The transition-template result is the most defensible experiment: it learns
-four ten-sample shapes (negative/positive combinations of previous and current
-chip polarity) from the first half of a recording, then evaluates the second
-half with only a global gain and offset fit. Its response to added noise is
-predictable and it measures the real RF capture at about 8.6 dB. It is still a
-decision-directed modem-quality metric, not calibrated RF SNR.
-
-These estimators remain host-side experiments. The public decoder API and its
-Codec2-compatible `discriminatorSnrDb` calculation are unchanged.
