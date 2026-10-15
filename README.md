@@ -52,10 +52,11 @@ lib_deps =
     dkaukov/esp32-freedv2400b @ 1.3.0
 ```
 
-For Arduino IDE, download the
+For Arduino IDE, open **Sketch > Include Library > Manage Libraries**, search
+for [`esp32-freedv2400b`](https://docs.arduino.cc/libraries/?query=esp32-freedv2400b),
+and install it. Alternatively, download the
 [GitHub release](https://github.com/dkaukov/esp32-freedv2400b/releases/latest)
-as a ZIP, then select **Sketch > Include Library > Add .ZIP Library**. The
-library is not currently listed in Arduino Library Manager.
+as a ZIP, then select **Sketch > Include Library > Add .ZIP Library**.
 
 ## Receive
 
